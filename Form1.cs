@@ -115,7 +115,7 @@ namespace FileCompare
             foreach (string file in System.IO.Directory.GetFiles(sourceDir))
             {
                 string targetFilePath = System.IO.Path.Combine(destDir, System.IO.Path.GetFileName(file));
-                
+
                 // 파일 복사 전 시간 체크 로직 추가 (최신 파일을 덮어쓰지 않도록 보호)
                 if (System.IO.File.Exists(targetFilePath))
                 {
@@ -323,10 +323,15 @@ namespace FileCompare
                         item.ForeColor = Color.Gray; // Old (오래됨)
                     }
                 }
-                
+
                 // 선택 항목 배경이나 아이템 리프레시 방지 버그를 위해 UseItemStyleForSubItems 켜기
                 item.UseItemStyleForSubItems = true;
             }
+        }
+
+        private void txtLeftDir_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

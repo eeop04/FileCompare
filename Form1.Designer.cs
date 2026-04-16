@@ -151,6 +151,7 @@
             txtLeftDir.Name = "txtLeftDir";
             txtLeftDir.Size = new Size(420, 27);
             txtLeftDir.TabIndex = 3;
+            txtLeftDir.TextChanged += txtLeftDir_TextChanged;
             // 
             // panel1
             // 

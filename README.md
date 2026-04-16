@@ -10,13 +10,10 @@
 
 ## 실행 화면 (과제2)
 - 2단계 코드의 실행 스크린샷
-(여기에 이미지 삽입)
-## 실행 화면 (과제3)
-- 3단계 코드의 실행 스크린샷
-(여기에 이미지 삽입)
-## 실행 화면 (과제4)
-- 4단계 코드의 실행 스크린샷
-(여기에 이미지 삽입)
+  
+  ![실행화면](img/7wSc2.png)
+  ![실행화면](img/7wSc3.png)
+  ![실행화면](img/7wSc4.png)
 
 # (C# 코딩) FileCompare
 ## 개요
@@ -32,26 +29,24 @@
 - 기본적인 UI 배치(UI는 Beyond Compare5를 참조하여 구성)
 ## 실행 화면 (과제2)
 - 코드의 실행 스크린샷과 구현 내용 설명
-![실행화면](img/screenshot-2.png)
-- 구현한 내용 (위 그림 참조)
-- OOOOO
 
-## 실행 화면 (과제3)
-- 코드의 실행 스크린샷과 구현 내용설명![실행화면](img/screenshot-3.png)
-- 구현한 내용 (위 그림 참조)
-- OOOOO
-## 실행 화면 (과제4)
-- 코드의 실행 스크린샷과 구현 내용설명![실행화면](img/screenshot-4.png)
-- 구현한 내용 (위 그림 참조)
-- OOOOO
+  ![실행화면](img/7wSc2.png)
+  ![실행화면](img/7wSc3.png)
+  ![실행화면](img/7wSc4.png)
+
+  - 구현한 내용 (위 그림 참조)
+	- 파일 비교 기능 구현 : 두 개의 파일을 선택하여 비교하는 기능 구현
+	- 파일 비교가 쉬워지게 색상 구분
 
 # (C# 코딩) File Compare
 ## 개요
 - C# 프로그래밍 학습
-- 1줄 소개: 
+- 1줄 소개: File Compare 프로그램을 기반으로 C# 프로그래밍 학습
 - 사용한 플랫폼: C#, .NET Windows Forms, Visual Studio, GitHub
 - 사용한 컨트롤: Label, TextBox, ListView, Button, SplitContainer, Panel
-- 사용한 기술과 구현한 기능:
+- 사용한 기술과 구현한 기능: 
+  - 파일 비교 기능 구현 : 두 개의 파일을 선택하여 비교하는 기능 구현
+  - 파일 비교가 쉬워지게 색상 구분
 - Visual Studio를 이용하여 UI 디자인
 
 
@@ -61,24 +56,16 @@
   ![실행화면](img/7wSc1.png)
 
 - 구현한 내용 (위 그림 참조)
-- UI 구성 : Label(앱 이름 표시), TextBox 2개(아이디, 패스워드)
-- Placeholder 표시 : 아이디와 패스워드 입력 힌트를 입력창 안에 회색으로 표시- 로그인 버튼 : 아이디와 패스워드가 모두 맞아야 로그인 허용
-## 실행 화면 (과제2)
-- 코드의 실행 스크린샷과 구현 내용 설명
-![실행화면](img/screenshot-2.png)
-- 구현한 내용 (위 그림 참조)
-- 패스워드 입력 내용 숨기기 : UseSystemPasswordChar 속성 이용
-- Placeholder 메시지를 표시할 때는 UseSystemPasswordChar 없애기
+- UI 구성 : Label, TextBox, ListView, Button, SplitContainer, Panel
 
-## 실행 화면 (과제3)
+- ## 실행 화면 (과제2)
 - 코드의 실행 스크린샷과 구현 내용 설명
-![실행화면](img/screenshot-3.png)
+
+  ![실행화면](img/7wSc2.png)
+  ![실행화면](img/7wSc3.png)
+  ![실행화면](img/7wSc4.png)
+
 - 구현한 내용 (위 그림 참조)
-- UI 구성 : Label(앱 이름 표시), TextBox 2개(아이디, 패스워드)
-- Placeholder 표시 : 아이디와 패스워드 입력 힌트를 입력창 안에 회색으로 표시- 로그인 버튼 : 아이디와 패스워드가 모두 맞아야 로그인 허용
-## 실행 화면 (과제4)
-- 코드의 실행 스크린샷과 구현 내용 설명
-![실행화면](img/screenshot-4.png)
-- 구현한 내용 (위 그림 참조)
-- 패스워드 입력 내용 숨기기 : UseSystemPasswordChar 속성 이용
-- Placeholder 메시지를 표시할 때는 UseSystemPasswordChar 없애기
+	- 파일 비교 기능 구현 : 두 개의 파일을 선택하여 비교하는 기능 구현
+	- 파일 비교가 쉬워지게 색상 구분
+
