@@ -34,39 +34,71 @@ namespace FileCompare
             foreach (ListViewItem item in sourceListView.SelectedItems)
             {
                 string itemName = item.Text;
-                
-                if (item.SubItems.Count > 1 && item.SubItems[1].Text == "파일 폴더")
-                {
-                    MessageBox.Show(this, $"'{itemName}'은(는) 폴더입니다. 파일만 복사할 수 있습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    continue;
-                }
-
                 string sourcePath = System.IO.Path.Combine(sourceDir, itemName);
                 string destPath = System.IO.Path.Combine(destDir, itemName);
 
-                if (!System.IO.File.Exists(sourcePath)) continue;
+                bool isFolder = (item.SubItems.Count > 1 && item.SubItems[1].Text == "파일 폴더");
 
-                string promptMessage;
-                if (System.IO.File.Exists(destPath))
+                if (isFolder)
                 {
-                    var sourceDate = System.IO.File.GetLastWriteTime(sourcePath).ToString("yyyy-MM-dd HH:mm:ss");
-                    var destDate = System.IO.File.GetLastWriteTime(destPath).ToString("yyyy-MM-dd HH:mm:ss");
-                    promptMessage = $"파일 '{sourcePath}' (수정일: {sourceDate}) 를\n파일 '{destPath}' (수정일: {destDate}) 에 덮어쓰기 복사하시겠습니까?";
+                    if (!System.IO.Directory.Exists(sourcePath)) continue;
+
+                    string promptMessage = $"폴더 '{itemName}'(와)과 하위 내용 전체를 복사하시겠습니까?";
+                    if (System.IO.Directory.Exists(destPath))
+                    {
+                        promptMessage = $"대상 경로에 이미 '{itemName}' 폴더가 존재합니다.\n해당 내용에 병합(오래된 파일 덮어쓰지 않음)을 진행하시겠습니까?";
+                    }
+
+                    if (MessageBox.Show(this, promptMessage, "폴더 복사 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            CopyDirectory(sourcePath, destPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(this, $"폴더 복사 중 오류가 발생했습니다.\n{ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
                 }
                 else
                 {
-                    promptMessage = $"파일 '{sourcePath}' 를\n파일 '{destPath}' 에 복사하시겠습니까?";
-                }
+                    if (!System.IO.File.Exists(sourcePath)) continue;
 
-                if (MessageBox.Show(this, promptMessage, "파일 복사 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    try
+                    string promptMessage = null;
+                    if (System.IO.File.Exists(destPath))
                     {
-                        System.IO.File.Copy(sourcePath, destPath, true);
+                        var sourceTime = System.IO.File.GetLastWriteTime(sourcePath);
+                        var destTime = System.IO.File.GetLastWriteTime(destPath);
+
+                        string sourceTimeStr = sourceTime.ToString("yyyy-MM-dd HH:mm:ss");
+                        string destTimeStr = destTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+                        // 동일 파일(검은색) 이거나 오래된 파일(회색)에서 최신(빨간색)으로 복사할 때는 아무 경고 없이 자동 무시(스킵)
+                        if (sourceTimeStr == destTimeStr || sourceTime < destTime)
+                        {
+                            continue;
+                        }
+
+                        // 최신 파일(빨간색)에서 오래된 파일(회색)으로 덮어쓸 때만 경고문 띄움
+                        promptMessage = $"파일 '{sourcePath}' (수정일: {sourceTimeStr}) 를\n파일 '{destPath}' (수정일: {destTimeStr}) 에 덮어쓰기 복사하시겠습니까?";
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show(this, $"파일 복사 중 오류가 발생했습니다.\n{ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // 반대편에 아예 없는 단독 파일(보라색) 복사
+                        promptMessage = $"파일 '{sourcePath}' 를\n파일 '{destPath}' 에 복사하시겠습니까?";
+                    }
+
+                    if (MessageBox.Show(this, promptMessage, "파일 복사 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            System.IO.File.Copy(sourcePath, destPath, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(this, $"파일 복사 중 오류가 발생했습니다.\n{ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                 }
             }
@@ -74,6 +106,37 @@ namespace FileCompare
             PopulateListView(lvwLeftDir, txtLeftDir.Text);
             PopulateListView(lvwRightDir, txtRightDir.Text);
             UpdateComparison();
+        }
+
+        private void CopyDirectory(string sourceDir, string destDir)
+        {
+            System.IO.Directory.CreateDirectory(destDir);
+
+            foreach (string file in System.IO.Directory.GetFiles(sourceDir))
+            {
+                string targetFilePath = System.IO.Path.Combine(destDir, System.IO.Path.GetFileName(file));
+                
+                // 파일 복사 전 시간 체크 로직 추가 (최신 파일을 덮어쓰지 않도록 보호)
+                if (System.IO.File.Exists(targetFilePath))
+                {
+                    var sourceTime = System.IO.File.GetLastWriteTime(file);
+                    var destTime = System.IO.File.GetLastWriteTime(targetFilePath);
+
+                    // 원본이 더 오래된 파일이면 복사를 건너뜁니다 (보호)
+                    if (sourceTime < destTime)
+                    {
+                        continue;
+                    }
+                }
+
+                System.IO.File.Copy(file, targetFilePath, true);
+            }
+
+            foreach (string directory in System.IO.Directory.GetDirectories(sourceDir))
+            {
+                string targetDirPath = System.IO.Path.Combine(destDir, System.IO.Path.GetFileName(directory));
+                CopyDirectory(directory, targetDirPath);
+            }
         }
 
         private void btnLeftDir_Click(object sender, EventArgs e)
@@ -212,14 +275,15 @@ namespace FileCompare
             var leftDirInfo = new System.IO.DirectoryInfo(txtLeftDir.Text);
             var rightDirInfo = new System.IO.DirectoryInfo(txtRightDir.Text);
 
+            // key: "[DIR]폴더이름" or "[FILE]파일이름"
             var leftDict = new Dictionary<string, DateTime>();
             var rightDict = new Dictionary<string, DateTime>();
 
-            foreach (var d in leftDirInfo.GetDirectories()) leftDict[d.Name] = d.LastWriteTime;
-            foreach (var f in leftDirInfo.GetFiles()) leftDict[f.Name] = f.LastWriteTime;
+            foreach (var d in leftDirInfo.GetDirectories()) leftDict[$"[DIR]{d.Name}"] = d.LastWriteTime;
+            foreach (var f in leftDirInfo.GetFiles()) leftDict[$"[FILE]{f.Name}"] = f.LastWriteTime;
 
-            foreach (var d in rightDirInfo.GetDirectories()) rightDict[d.Name] = d.LastWriteTime;
-            foreach (var f in rightDirInfo.GetFiles()) rightDict[f.Name] = f.LastWriteTime;
+            foreach (var d in rightDirInfo.GetDirectories()) rightDict[$"[DIR]{d.Name}"] = d.LastWriteTime;
+            foreach (var f in rightDirInfo.GetFiles()) rightDict[$"[FILE]{f.Name}"] = f.LastWriteTime;
 
             ApplyComparisonColors(lvwLeftDir, leftDict, rightDict);
             ApplyComparisonColors(lvwRightDir, rightDict, leftDict);
@@ -229,16 +293,18 @@ namespace FileCompare
         {
             foreach (ListViewItem item in lv.Items)
             {
-                string name = item.Text;
-                if (!otherDict.ContainsKey(name))
+                bool isFolder = (item.SubItems.Count > 1 && item.SubItems[1].Text == "파일 폴더");
+                string key = (isFolder ? "[DIR]" : "[FILE]") + item.Text;
+
+                if (!otherDict.ContainsKey(key))
                 {
-                    // 단독 파일
+                    // 단독 파일/폴더
                     item.ForeColor = Color.Purple;
                 }
                 else
                 {
-                    var myTime = myDict[name];
-                    var otherTime = otherDict[name];
+                    var myTime = myDict.ContainsKey(key) ? myDict[key] : DateTime.MinValue;
+                    var otherTime = otherDict[key];
 
                     // 사용자에게 보여지는 화면과 동일한 형식(초 단위)으로 비교
                     string myTimeStr = myTime.ToString("yyyy-MM-dd HH:mm:ss");
@@ -257,6 +323,9 @@ namespace FileCompare
                         item.ForeColor = Color.Gray; // Old (오래됨)
                     }
                 }
+                
+                // 선택 항목 배경이나 아이템 리프레시 방지 버그를 위해 UseItemStyleForSubItems 켜기
+                item.UseItemStyleForSubItems = true;
             }
         }
     }
